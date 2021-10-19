@@ -32,12 +32,7 @@ namespace GameOfLife
         /// <summary>
         /// The refresh rate of the board in milliseconds
         /// </summary>
-        private int _refreshRate = 500;
-
-        /// <summary>
-        /// The cells living in the board
-        /// </summary>
-        private List<ICell> _cells = new List<ICell>();
+        private int _refreshRate = 1 * 1000;
 
         #endregion
 
@@ -55,7 +50,15 @@ namespace GameOfLife
 
         private void PopulateWorld()
         {
-            _cells.Add(new SimpleCell(this._gameBoard, 5, 5));
+            var numberOfCells = 75;
+
+            for (int i = 0; i < numberOfCells; i++)
+            {
+                var x = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+                var y = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+
+                _gameBoard.SetField(x, y);
+            }
         }
 
         /// <summary>
@@ -63,13 +66,37 @@ namespace GameOfLife
         /// </summary>
         private void StartGameLoop()
         {
+            PopulateWorld();
             while (!_gameover)
             {
-                Demo();
+                //Demo();
                 DrawBoard();
                 Thread.Sleep(_refreshRate);
+                PulseLife();
             }
 
+        }
+
+        /// <summary>
+        /// Pulses the life.
+        /// </summary>
+        private void PulseLife()
+        {
+            for (int x = 0; x < BOARD_SIZE; x++)
+            {
+                for (int y = 0; y < BOARD_SIZE; y++)
+                {
+                    var neighbors = CellManager.CountNeighbors(_gameBoard, x, y);
+
+                    if (_gameBoard.GetField(x, y) && (neighbors == 2 | neighbors == 3))
+                        continue;
+
+                    if (!_gameBoard.GetField(x, y) && neighbors == 3)
+                        CellManager.Create(_gameBoard, x, y);
+                    else
+                        CellManager.Kill(_gameBoard, x, y);
+                }
+            }
         }
 
         /// <summary>
@@ -84,23 +111,11 @@ namespace GameOfLife
                 for (int j = 0; j < BOARD_SIZE; j++)
                 {
                     if (_gameBoard.GetField(i, j))
-                        Console.Write("X");
+                        Console.Write("O");
                     else
-                        Console.Write(" ");
+                        Console.Write("  ");
                     if (j + 1 == BOARD_SIZE) Console.WriteLine();
                 }
-            }
-        }
-
-
-        /// <summary>
-        /// Makes each cell on the board pulse
-        /// </summary>
-        private void PulseCells()
-        {
-            foreach (var cell in _cells)
-            {
-                cell.Pusle();
             }
         }
 
