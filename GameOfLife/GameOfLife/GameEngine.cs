@@ -32,7 +32,7 @@ namespace GameOfLife
         /// <summary>
         /// The refresh rate of the board in milliseconds
         /// </summary>
-        private int _refreshRate = 1 * 1000;
+        private int _refreshRate = 250;
 
         #endregion
 
@@ -50,15 +50,8 @@ namespace GameOfLife
 
         private void PopulateWorld()
         {
-            var numberOfCells = 75;
-
-            for (int i = 0; i < numberOfCells; i++)
-            {
-                var x = RandomNumberGenerator.GetInt32(BOARD_SIZE);
-                var y = RandomNumberGenerator.GetInt32(BOARD_SIZE);
-
-                _gameBoard.SetField(x, y);
-            }
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Toad, 15, 15);
+            CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
         }
 
         /// <summary>
@@ -82,19 +75,23 @@ namespace GameOfLife
         /// </summary>
         private void PulseLife()
         {
+            var boardClone = _gameBoard.Clone();
+
             for (int x = 0; x < BOARD_SIZE; x++)
             {
                 for (int y = 0; y < BOARD_SIZE; y++)
                 {
-                    var neighbors = CellManager.CountNeighbors(_gameBoard, x, y);
+                    var neighbors = CellManager.CountNeighbors(boardClone, x, y);
+                    var isLiveCell = boardClone.GetField(x, y);
 
-                    if (_gameBoard.GetField(x, y) && (neighbors == 2 | neighbors == 3))
-                        continue;
-
-                    if (!_gameBoard.GetField(x, y) && neighbors == 3)
-                        CellManager.Create(_gameBoard, x, y);
-                    else
+                    //Any live cell with two or three live neighbours survives.
+                    if (isLiveCell && (neighbors != 2 && neighbors != 3)) {
                         CellManager.Kill(_gameBoard, x, y);
+                    }
+
+                    //Any dead cell with three live neighbours becomes a live cell.
+                    if (!isLiveCell && neighbors == 3)
+                        CellManager.Create(_gameBoard, x, y);
                 }
             }
         }
@@ -104,17 +101,18 @@ namespace GameOfLife
         /// </summary>
         private void DrawBoard()
         {
-
             Console.Clear();
-            for (int i = 0; i < BOARD_SIZE; i++)
+            Console.WriteLine("Game started!");
+            Console.WriteLine();
+            for (int x = 0; x < BOARD_SIZE; x++)
             {
-                for (int j = 0; j < BOARD_SIZE; j++)
+                for (int y = 0; y < BOARD_SIZE; y++)
                 {
-                    if (_gameBoard.GetField(i, j))
+                    if (_gameBoard.GetField(x, y))
                         Console.Write("O");
                     else
-                        Console.Write("  ");
-                    if (j + 1 == BOARD_SIZE) Console.WriteLine();
+                        Console.Write(" ");
+                    if (y + 1 == BOARD_SIZE) Console.WriteLine();
                 }
             }
         }
