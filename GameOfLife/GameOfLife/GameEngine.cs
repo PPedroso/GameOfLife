@@ -51,7 +51,8 @@ namespace GameOfLife
         private void PopulateWorld()
         {
             CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Toad, 15, 15);
-            CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Beacon, 5, 5);
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
         }
 
         /// <summary>

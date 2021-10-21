@@ -72,14 +72,24 @@
                     gameBoard.SetField(x, y - 1);
                     gameBoard.SetField(x, y + 1);
                     break;
-                
+
                 case OscilatorType.Toad:
                     gameBoard.SetField(x, y);
                     gameBoard.SetField(x, y - 1);
                     gameBoard.SetField(x, y - 2);
                     gameBoard.SetField(x - 1, y);
                     gameBoard.SetField(x - 1, y - 1);
-                    gameBoard.SetField(x - 1, y +1);
+                    gameBoard.SetField(x - 1, y + 1);
+                    break;
+                case OscilatorType.Beacon:
+                    gameBoard.SetField(x, y);
+                    gameBoard.SetField(x, y - 1);
+                    gameBoard.SetField(x -1, y);
+                    gameBoard.SetField(x - 1, y - 1);
+                    gameBoard.SetField(x + 1, y + 1);
+                    gameBoard.SetField(x + 1, y + 2);
+                    gameBoard.SetField(x + 2, y + 1);
+                    gameBoard.SetField(x + 2, y + 2);
                     break;
 
             }
@@ -100,7 +110,7 @@
                     gameBoard.SetField(x - 1, y);
                     gameBoard.SetField(x - 2, y);
                     gameBoard.SetField(x, y - 1);
-                    gameBoard.SetField(x - 1, y -2);
+                    gameBoard.SetField(x - 1, y - 2);
                     break;
             }
         }
