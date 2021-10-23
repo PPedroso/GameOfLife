@@ -1,4 +1,6 @@
-﻿namespace GameOfLife.Cells
+﻿using GameOfLife.Board;
+
+namespace GameOfLife.Cells
 {
     /// <summary>
     /// Abstract class for base cell functionalities

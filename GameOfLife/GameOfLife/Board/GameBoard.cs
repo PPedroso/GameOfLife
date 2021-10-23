@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
 
-namespace GameOfLife
+namespace GameOfLife.Board
 {
     /// <summary>
     /// Represents the game board
@@ -14,7 +11,7 @@ namespace GameOfLife
     {
         #region Fields
 
-        private bool[][] _gameBoard;
+        private BoardStateField[][] _gameBoard;
         private int _boardSize;
 
         #endregion
@@ -28,11 +25,14 @@ namespace GameOfLife
         public GameBoard(int boardSize)
         {
             _boardSize = boardSize;
-            _gameBoard = new bool[_boardSize][];
+            _gameBoard = new BoardStateField[_boardSize][];
 
             for (int y = 0; y < _boardSize; y++)
             {
-                _gameBoard[y] = new bool[_boardSize];
+                _gameBoard[y] = new BoardStateField[_boardSize];
+
+                for (int x = 0; x < _boardSize; x++)
+                    _gameBoard[y][x] = new BoardStateField();
             }
         }
 
@@ -50,7 +50,7 @@ namespace GameOfLife
             if (x < 0 || x >= _gameBoard.Length) return false;
             if (y < 0 || y >= _gameBoard.Length) return false;
 
-            return _gameBoard[x][y];
+            return _gameBoard[x][y].presentState;
         }
 
         /// <summary>
@@ -58,29 +58,41 @@ namespace GameOfLife
         /// </summary>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
-        public void SetField(int x, int y) => _gameBoard[x][y] = true;
+        public void SetField(int x, int y) => _gameBoard[x][y].futureState = true;
 
         /// <summary>
         /// Resets the field at x,y coordinate
         /// </summary>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
-        public void ResetField(int x, int y) => _gameBoard[x][y] = false;
+        public void ResetField(int x, int y) => _gameBoard[x][y].futureState = false;
 
         /// <summary>
         /// Clones this instance.
         /// </summary>
         /// <returns></returns>
-        public GameBoard Clone() {
-            using (var ms = new MemoryStream())
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, this);
-                ms.Position = 0;
+        public GameBoard Clone()
+        {
+            var gameBoardClone = (GameBoard)this.MemberwiseClone();
+            var boardClone = this._gameBoard;
 
-                return (GameBoard)formatter.Deserialize(ms);
+            return null;
+        }
+
+        /// <summary>
+        /// Moves the future state to the present
+        /// </summary>
+        public void PresentToFuture()
+        {
+            foreach (var boardField in _gameBoard)
+            {
+                boardField.ToList().ForEach(field =>
+                {
+                    field.presentState = field.futureState;
+                    field.futureState = false;
+                });
             }
-        } 
+        }
 
         #endregion
     }

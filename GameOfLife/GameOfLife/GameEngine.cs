@@ -1,6 +1,6 @@
-﻿using GameOfLife.Cells;
+﻿using GameOfLife.Board;
+using GameOfLife.Cells;
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
 
@@ -50,9 +50,9 @@ namespace GameOfLife
 
         private void PopulateWorld()
         {
-            CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
-            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pentadecathlon, 10, 10);
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pentadecathlon, 10, 10);
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
         }
 
         /// <summary>
@@ -76,14 +76,13 @@ namespace GameOfLife
         /// </summary>
         private void PulseLife()
         {
-            var boardClone = _gameBoard.Clone();
 
             for (int x = 0; x < BOARD_SIZE; x++)
             {
                 for (int y = 0; y < BOARD_SIZE; y++)
                 {
-                    var neighbors = CellManager.CountNeighbors(boardClone, x, y);
-                    var isLiveCell = boardClone.GetField(x, y);
+                    var neighbors = CellManager.CountNeighbors(_gameBoard, x, y);
+                    var isLiveCell = _gameBoard.GetField(x, y);
 
                     //Any live cell with two or three live neighbours survives.
                     if (isLiveCell && (neighbors != 2 && neighbors != 3)) {
@@ -95,6 +94,8 @@ namespace GameOfLife
                         CellManager.Create(_gameBoard, x, y);
                 }
             }
+
+            _gameBoard.PresentToFuture();
         }
 
         /// <summary>
