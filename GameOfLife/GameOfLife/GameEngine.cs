@@ -1,8 +1,10 @@
 ﻿using GameOfLife.Board;
 using GameOfLife.Cells;
 using System;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GameOfLife
 {
@@ -32,7 +34,12 @@ namespace GameOfLife
         /// <summary>
         /// The refresh rate of the board in milliseconds
         /// </summary>
-        private int _refreshRate = 50;
+        private int _refreshRate = 250;
+
+        /// <summary>
+        /// If true, the game is paused
+        /// </summary>
+        private bool _pause = false;
 
         #endregion
 
@@ -45,6 +52,7 @@ namespace GameOfLife
             _gameBoard = new GameBoard(BOARD_SIZE);
 
             PopulateWorld();
+            StartInputCapture();
             StartGameLoop();
         }
 
@@ -53,7 +61,7 @@ namespace GameOfLife
             //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
             CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
 
-            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker,15,15);
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 15, 15);
 
             //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
         }
@@ -63,24 +71,34 @@ namespace GameOfLife
         /// </summary>
         private void StartGameLoop()
         {
-            int count = 1;
-
             PopulateWorld();
             while (!_gameover)
             {
                 //Demo();
                 DrawBoard();
                 Thread.Sleep(_refreshRate);
-                CellManager.PulseLife(_gameBoard);
-                ++count;
-
-                //if (count % 20 == 0)
-                //    CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
+                if (!_pause)
+                    CellManager.PulseLife(_gameBoard);
             }
 
         }
 
+        /// <summary>
+        /// Starts a task to capture user input
+        /// </summary>
+        private void StartInputCapture()
+        {
+            new Task(() =>
+            {
+                while (true)
+                {
+                    var c = Console.ReadKey().Key;
+                    if (c == ConsoleKey.P)
+                        _pause = !_pause;
+                }
 
+            }).Start();
+        }
 
         /// <summary>
         /// Draws the board
