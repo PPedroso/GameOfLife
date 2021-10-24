@@ -32,7 +32,7 @@ namespace GameOfLife
         /// <summary>
         /// The refresh rate of the board in milliseconds
         /// </summary>
-        private int _refreshRate = 250;
+        private int _refreshRate = 50;
 
         #endregion
 
@@ -51,8 +51,11 @@ namespace GameOfLife
         private void PopulateWorld()
         {
             //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pentadecathlon, 10, 10);
-            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
+            CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
+
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker,15,15);
+
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
         }
 
         /// <summary>
@@ -60,43 +63,24 @@ namespace GameOfLife
         /// </summary>
         private void StartGameLoop()
         {
+            int count = 1;
+
             PopulateWorld();
             while (!_gameover)
             {
                 //Demo();
                 DrawBoard();
                 Thread.Sleep(_refreshRate);
-                PulseLife();
+                CellManager.PulseLife(_gameBoard);
+                ++count;
+
+                //if (count % 20 == 0)
+                //    CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
             }
 
         }
 
-        /// <summary>
-        /// Pulses the life.
-        /// </summary>
-        private void PulseLife()
-        {
 
-            for (int x = 0; x < BOARD_SIZE; x++)
-            {
-                for (int y = 0; y < BOARD_SIZE; y++)
-                {
-                    var neighbors = CellManager.CountNeighbors(_gameBoard, x, y);
-                    var isLiveCell = _gameBoard.GetField(x, y);
-
-                    //Any live cell with two or three live neighbours survives.
-                    if (isLiveCell && (neighbors != 2 && neighbors != 3)) {
-                        CellManager.Kill(_gameBoard, x, y);
-                    }
-
-                    //Any dead cell with three live neighbours becomes a live cell.
-                    if (!isLiveCell && neighbors == 3)
-                        CellManager.Create(_gameBoard, x, y);
-                }
-            }
-
-            _gameBoard.PresentToFuture();
-        }
 
         /// <summary>
         /// Draws the board

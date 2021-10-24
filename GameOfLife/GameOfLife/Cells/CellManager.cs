@@ -162,12 +162,9 @@ namespace GameOfLife.Cells
                     gameBoard.SetField(x + 3, y + 1);
                     gameBoard.SetField(x + 4, y);
                     gameBoard.SetField(x + 5, y);
-
-
-
                     break;
-
             }
+            PulseLife(gameBoard);
         }
 
         /// <summary>
@@ -188,6 +185,40 @@ namespace GameOfLife.Cells
                     gameBoard.SetField(x - 1, y - 2);
                     break;
             }
+
+            PulseLife(gameBoard);
+        }
+
+        /// <summary>
+        /// Pulses the life.
+        /// </summary>
+        public static void PulseLife(GameBoard board)
+        {
+
+            for (int x = 0; x < board.GetBoardLenght; x++)
+            {
+                for (int y = 0; y < board.GetBoardLenght; y++)
+                {
+                    var neighbors = CellManager.CountNeighbors(board, x, y);
+                    var isLiveCell = board.GetField(x, y);
+
+                    //Any live cell with two or three live neighbours survives.
+                    if (isLiveCell)
+                    {
+                        if(neighbors != 2 && neighbors != 3)
+                            CellManager.Kill(board, x, y);
+                        else
+                            CellManager.Create(board, x, y);
+                    }
+                    
+
+                    //Any dead cell with three live neighbours becomes a live cell.
+                    if (!isLiveCell && neighbors == 3)
+                        CellManager.Create(board, x, y);
+                }
+            }
+
+            board.PresentToFuture();
         }
     }
 }

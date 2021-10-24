@@ -16,6 +16,12 @@ namespace GameOfLife.Board
 
         #endregion
 
+        #region Properties
+
+        public int GetBoardLenght => _boardSize;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
