@@ -71,6 +71,13 @@ namespace GameOfLife.Cells
             switch (type)
             {
                 case OscilatorType.Blinker:
+                    if (x < 1) x = 1;
+                    if (y < 1) y = 1;
+
+                    //TODO: Refactor this to be used by all cell forms
+                    if (x >= gameBoard.GetBoardLenght -1) x = gameBoard.GetBoardLenght - 2;
+                    if (y >= gameBoard.GetBoardLenght -1) y = gameBoard.GetBoardLenght - 2;
+
                     gameBoard.SetField(x, y);
                     gameBoard.SetField(x, y - 1);
                     gameBoard.SetField(x, y + 1);
@@ -205,12 +212,12 @@ namespace GameOfLife.Cells
                     //Any live cell with two or three live neighbours survives.
                     if (isLiveCell)
                     {
-                        if(neighbors != 2 && neighbors != 3)
+                        if (neighbors != 2 && neighbors != 3)
                             CellManager.Kill(board, x, y);
                         else
                             CellManager.Create(board, x, y);
                     }
-                    
+
 
                     //Any dead cell with three live neighbours becomes a live cell.
                     if (!isLiveCell && neighbors == 3)

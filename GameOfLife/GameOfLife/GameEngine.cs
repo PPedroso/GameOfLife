@@ -59,10 +59,7 @@ namespace GameOfLife
         private void PopulateWorld()
         {
             //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
-            CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 5, 5);
-
-            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 15, 15);
-
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 15, 15);
             //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
         }
 
@@ -74,7 +71,6 @@ namespace GameOfLife
             PopulateWorld();
             while (!_gameover)
             {
-                //Demo();
                 DrawBoard();
                 Thread.Sleep(_refreshRate);
                 if (!_pause)
@@ -92,9 +88,32 @@ namespace GameOfLife
             {
                 while (true)
                 {
-                    var c = Console.ReadKey().Key;
-                    if (c == ConsoleKey.P)
-                        _pause = !_pause;
+                    var key = Console.ReadKey().Key;
+
+                    switch (key)
+                    {
+                        case ConsoleKey.P:
+                            _pause = !_pause;
+                            break;
+
+                        case ConsoleKey.B:
+                            CellManager.AddOscillator(
+                                _gameBoard,
+                                CellManager.OscilatorType.Blinker,
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
+                            break;
+
+
+                        case ConsoleKey.G:
+                            CellManager.AddSpaceship(
+                                _gameBoard,
+                                CellManager.SpaceshipType.Glider,
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
+                            break;
+
+                    }
                 }
 
             }).Start();
@@ -106,7 +125,7 @@ namespace GameOfLife
         private void DrawBoard()
         {
             Console.Clear();
-            Console.WriteLine("Game started!");
+            ShowMenu();
             Console.WriteLine();
             for (int x = 0; x < BOARD_SIZE; x++)
             {
@@ -119,6 +138,17 @@ namespace GameOfLife
                     if (y + 1 == BOARD_SIZE) Console.WriteLine();
                 }
             }
+        }
+
+        /// <summary>
+        /// Shows the user menu
+        /// </summary>
+        private void ShowMenu()
+        {
+            Console.WriteLine("Game started!");
+            Console.WriteLine("P - Pause game");
+            Console.WriteLine("B - Create blinker");
+            Console.WriteLine("G - Create glider");
         }
 
         #region Debug
