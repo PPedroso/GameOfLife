@@ -4,8 +4,11 @@
     {
         static void Main(string[] args)
         {
-            var gameEngine = new GameEngine();
-            gameEngine.Start();
+            using (var gameEngine = new GameEngine())
+            {
+                gameEngine.Start();
+            }
+
         }
 
     }
