@@ -5,7 +5,6 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,10 +71,20 @@ namespace GameOfLife
         {
             GL.ClearColor(new Color4(0.3f, 0.4f, 0.5f, 1f));
 
+            base.OnLoad();
+        }
+
+        /// <summary>
+        /// Sets a point to draw a figure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        private void SetPointToDraw(float x, float y)
+        {
             float[] vertices = new float[] {
-                0.0f, 0.5f, 0f,   //vertex0
-                0.5f, -0.5f, 0f,  //vertex1
-                -0.5f, -0.5f, 0f  //vertex2
+                x+ 0.0f, y+0.05f, 0f,   //Bottom left vertex
+                x+0.05f, y+-0.05f, 0f,  //Bottom right vertex
+                x+-0.05f, y+-0.05f, 0f  //Top vertex
             };
 
             this.vertexBufferHandle = GL.GenBuffer();
@@ -135,16 +144,18 @@ namespace GameOfLife
 
             GL.DeleteShader(vertexShaderHandle);
             GL.DeleteShader(pixelShaderHandle);
-
-            base.OnLoad();
         }
 
-        
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            float x = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
+            float y = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
+
+            SetPointToDraw(x, y);
 
             GL.UseProgram(this.shaderProgramHandle);
             GL.BindVertexArray(this.vertexArrayHandle);
