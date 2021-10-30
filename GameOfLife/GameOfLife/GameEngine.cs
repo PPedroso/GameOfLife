@@ -26,7 +26,7 @@ namespace GameOfLife
         /// <summary>
         /// The board size
         /// </summary>
-        private const int BOARD_SIZE = 20;
+        private const int BOARD_SIZE = 200;
 
         /// <summary>
         /// The game board
@@ -51,7 +51,8 @@ namespace GameOfLife
         /// </summary>
         private static GameWindowSettings _gameWindowSettings = new GameWindowSettings
         {
-
+            RenderFrequency = 20,
+            UpdateFrequency = 20
         };
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace GameOfLife
 
         #region Constructor
 
-        public GameEngine() : base(GameWindowSettings.Default, _nativeWindowSettings)
+        public GameEngine() : base(_gameWindowSettings, _nativeWindowSettings)
         {
         }
 
@@ -85,11 +86,25 @@ namespace GameOfLife
             if (KeyboardState.IsKeyDown(Keys.Escape))
                 Close();
 
+            if (KeyboardState.IsKeyDown(Keys.B))
+                CellManager.AddOscillator(
+                                 _gameBoard,
+                                 CellManager.OscilatorType.Blinker,
+                                 RandomNumberGenerator.GetInt32(BOARD_SIZE),
+                                 RandomNumberGenerator.GetInt32(BOARD_SIZE));
+
+            if (KeyboardState.IsKeyDown(Keys.G))
+                CellManager.AddSpaceship(
+                                _gameBoard,
+                                CellManager.SpaceshipType.Glider,
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
+                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
+
             base.OnUpdateFrame(args);
         }
 
 
-        static float symbolSize = 0.01f;
+        static float symbolSize = 0.005f;
 
 
         protected override void OnLoad()
@@ -97,7 +112,7 @@ namespace GameOfLife
             base.OnLoad();
 
             GL.ClearColor(new Color4(0.3f, 0.4f, 0.5f, 1f));
-
+            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 50, 50);
         }
 
         protected override void OnUnload()
@@ -122,10 +137,10 @@ namespace GameOfLife
         private void DrawSquareAt(float x, float y)
         {
             float[] _vertices = new float[] {
-                x + symbolSize *  1f,  y + symbolSize *  1f, 0.0f, // top right
-                x + symbolSize *  1f,  y + symbolSize * -1f, 0.0f, // bottom right
-                x + symbolSize * -1f,  y + symbolSize * -1f, 0.0f,  // bottom left
-                x + symbolSize * -1f,  y + symbolSize *  1f, 0.0f,  // top left
+                x + symbolSize *  1f,y + symbolSize *  1f, 0.0f, // top right
+                x + symbolSize *  1f,y + symbolSize * -1f, 0.0f, // bottom right
+                x + symbolSize * -1f,y + symbolSize * -1f, 0.0f,  // bottom left
+                x + symbolSize * -1f,y + symbolSize *  1f, 0.0f,  // top left
             };
 
             uint[] _indices =
@@ -158,10 +173,10 @@ namespace GameOfLife
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            float x = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
-            float y = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
 
-            DrawSquareAt(0, 0);
+            CellManager.PulseLife(_gameBoard);
+            DrawBoard();
+
             SwapBuffers();
         }
 
@@ -173,74 +188,30 @@ namespace GameOfLife
         public void Start()
         {
             _gameBoard = new GameBoard(BOARD_SIZE);
-
             PopulateWorld();
-            StartInputCapture();
-            StartGameLoop();
+            this.Run();
         }
 
         private void PopulateWorld()
         {
             //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 15, 15);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 1, 1);
-        }
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 20);
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 60);
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 100);
+            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 120);
 
-        /// <summary>
-        /// Starts the game loop that keeps the game running
-        /// </summary>
-        private void StartGameLoop()
-        {
-            //PopulateWorld();
+            for (int x = 25; x <= 175; x += 25)
+                for (int y = 25; y <= 175; y += 25)
+                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x, y);
 
-            this.Run();
-            //while (!_gameover)
-            //{
-            //    DrawBoard();
-            //    Thread.Sleep(_refreshRate);
-            //    if (!_pause)
-            //        CellManager.PulseLife(_gameBoard);
-            //}
-        }
-
-        /// <summary>
-        /// Starts a task to capture user input
-        /// </summary>
-        private void StartInputCapture()
-        {
-            new Task(() =>
-            {
-                while (true)
-                {
-                    var key = Console.ReadKey().Key;
-
-                    switch (key)
-                    {
-                        case ConsoleKey.P:
-                            _pause = !_pause;
-                            break;
-
-                        case ConsoleKey.B:
-                            CellManager.AddOscillator(
-                                _gameBoard,
-                                CellManager.OscilatorType.Blinker,
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
-                            break;
-
-
-                        case ConsoleKey.G:
-                            CellManager.AddSpaceship(
-                                _gameBoard,
-                                CellManager.SpaceshipType.Glider,
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
-                            break;
-
-                    }
-                }
-
-            }).Start();
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 75, 75);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 100, 100);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 125, 125);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 150, 150);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 175, 175);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 50, 100);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 100, 50);
+            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 35, 115);
         }
 
         /// <summary>
@@ -248,18 +219,15 @@ namespace GameOfLife
         /// </summary>
         private void DrawBoard()
         {
-            Console.Clear();
-            ShowMenu();
-            Console.WriteLine();
+            //Console.Clear();
+            //ShowMenu();
+            //Console.WriteLine();
             for (int x = 0; x < BOARD_SIZE; x++)
             {
                 for (int y = 0; y < BOARD_SIZE; y++)
                 {
                     if (_gameBoard.GetField(x, y))
-                        Console.Write("O");
-                    else
-                        Console.Write(" ");
-                    if (y + 1 == BOARD_SIZE) Console.WriteLine();
+                        DrawSquareAt((x - 99f) / 100f, (99f - y) / 100f);
                 }
             }
         }
@@ -274,27 +242,5 @@ namespace GameOfLife
             Console.WriteLine("B - Create blinker");
             Console.WriteLine("G - Create glider");
         }
-
-        #region Debug
-
-        /// <summary>
-        /// Demo to test the board
-        /// </summary>
-        private void Demo()
-        {
-            for (int i = 0; i < BOARD_SIZE; i++)
-            {
-                var x = RandomNumberGenerator.GetInt32(BOARD_SIZE);
-                var y = RandomNumberGenerator.GetInt32(BOARD_SIZE);
-                var choice = RandomNumberGenerator.GetInt32(2);
-
-                if (choice == 0)
-                    _gameBoard.SetField(x, y);
-                else
-                    _gameBoard.ResetField(x, y);
-            }
-        }
-
-        #endregion
     }
 }
