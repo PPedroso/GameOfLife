@@ -1,12 +1,14 @@
 ﻿using GameOfLife.Board;
 using GameOfLife.Cells;
-using OpenTK.Graphics.OpenGL;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameOfLife
@@ -16,8 +18,6 @@ namespace GameOfLife
     /// </summary>
     public class GameEngine : GameWindow
     {
-        #region Fields
-
         /// <summary>
         /// If true, the game has ended
         /// </summary>
@@ -44,125 +44,125 @@ namespace GameOfLife
         /// </summary>
         private bool _pause = false;
 
+        #region GameSettings
+
+        /// <summary>
+        /// The settings for the game window
+        /// </summary>
+        private static GameWindowSettings _gameWindowSettings = new GameWindowSettings
+        {
+
+        };
+
+        /// <summary>
+        /// The settings for the native window
+        /// </summary>
+        private static NativeWindowSettings _nativeWindowSettings = new NativeWindowSettings
+        {
+            Size = new Vector2i(800, 800),
+            Title = "Game of Life",
+        };
+
         #endregion
 
         #region Constructor
 
-        public GameEngine() : base(GameWindowSettings.Default, NativeWindowSettings.Default)
+        public GameEngine() : base(GameWindowSettings.Default, _nativeWindowSettings)
         {
-            this.CenterWindow(new Vector2i(1200, 768));
         }
 
         #endregion
 
         #region Render functionality
 
-        private int vertexBufferHandle;
-        private int shaderProgramHandle;
-        private int vertexArrayHandle;
+        private int _vertexBufferObject;
+        private int _vertexArrayObject;
+        private int _elementBufferObject;
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+
+            if (KeyboardState.IsKeyDown(Keys.Escape))
+                Close();
+
             base.OnUpdateFrame(args);
         }
 
 
+        static float symbolSize = 0.01f;
+
+
         protected override void OnLoad()
         {
+            base.OnLoad();
+
             GL.ClearColor(new Color4(0.3f, 0.4f, 0.5f, 1f));
 
-            base.OnLoad();
+        }
+
+        protected override void OnUnload()
+        {
+            // Unbind all the resources by binding the targets to 0/null.
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
+            GL.UseProgram(0);
+
+            // Delete all the resources.
+            GL.DeleteBuffer(_vertexBufferObject);
+            GL.DeleteVertexArray(_vertexArrayObject);
+
+            base.OnUnload();
         }
 
         /// <summary>
-        /// Sets a point to draw a figure
+        /// Draws a square form at x,y
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        private void SetPointToDraw(float x, float y)
+        private void DrawSquareAt(float x, float y)
         {
-            float[] vertices = new float[] {
-                x+ 0.0f, y+0.05f, 0f,   //Bottom left vertex
-                x+0.05f, y+-0.05f, 0f,  //Bottom right vertex
-                x+-0.05f, y+-0.05f, 0f  //Top vertex
+            float[] _vertices = new float[] {
+                x + symbolSize *  1f,  y + symbolSize *  1f, 0.0f, // top right
+                x + symbolSize *  1f,  y + symbolSize * -1f, 0.0f, // bottom right
+                x + symbolSize * -1f,  y + symbolSize * -1f, 0.0f,  // bottom left
+                x + symbolSize * -1f,  y + symbolSize *  1f, 0.0f,  // top left
             };
 
-            this.vertexBufferHandle = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBufferHandle);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            uint[] _indices =
+            {
+                3, 2, 0, // The first triangle will be the bottom-right half of the triangle
+                2, 0, 1  // Then the second will be the top-right half of the triangle
+            };
 
-            this.vertexArrayHandle = GL.GenVertexArray();
-            GL.BindVertexArray(this.vertexArrayHandle);
+            _vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBufferHandle);
+            _vertexArrayObject = GL.GenVertexArray();
+            GL.BindVertexArray(_vertexArrayObject);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            GL.BindVertexArray(0);
+            _elementBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
 
-            string vertexShaderCode =
-                @"
-                #version 330 core
-
-                layout (location = 0) in vec3 aPosition
-                    void main()
-                {
-                    gl_Position = vec4(aPosition,1f);
-                }
-                ";
-
-            string pixelShaderCode =
-                @"
-                #version 330 core
-
-                out vec4 pixelColor;                
-
-                void main()
-                {
-                    pixelColor = vec4(0.8f,0.1f,1f);
-                }
-                ";
-
-            int vertexShaderHandle = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShaderHandle, vertexShaderCode);
-            GL.CompileShader(vertexShaderHandle);
-
-            int pixelShaderHandle = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(pixelShaderHandle, pixelShaderCode);
-            GL.CompileShader(pixelShaderHandle);
-
-            this.shaderProgramHandle = GL.CreateProgram();
-
-            GL.AttachShader(this.shaderProgramHandle, vertexShaderHandle);
-            GL.AttachShader(this.shaderProgramHandle, pixelShaderHandle);
-
-            GL.LinkProgram(this.shaderProgramHandle);
-
-            GL.DetachShader(this.shaderProgramHandle, vertexShaderHandle);
-            GL.DetachShader(this.shaderProgramHandle, pixelShaderHandle);
-
-            GL.DeleteShader(vertexShaderHandle);
-            GL.DeleteShader(pixelShaderHandle);
+            GL.BindVertexArray(this._vertexArrayObject);
+            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
+            base.OnRenderFrame(args);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             float x = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
             float y = ((float)RandomNumberGenerator.GetInt32(101)) / 100f;
 
-            SetPointToDraw(x, y);
-
-            GL.UseProgram(this.shaderProgramHandle);
-            GL.BindVertexArray(this.vertexArrayHandle);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-
-            this.Context.SwapBuffers();
-            base.OnRenderFrame(args);
+            DrawSquareAt(0, 0);
+            SwapBuffers();
         }
 
         #endregion
@@ -191,17 +191,16 @@ namespace GameOfLife
         /// </summary>
         private void StartGameLoop()
         {
-            PopulateWorld();
+            //PopulateWorld();
 
             this.Run();
-            while (!_gameover)
-            {
-                DrawBoard();
-                Thread.Sleep(_refreshRate);
-                if (!_pause)
-                    CellManager.PulseLife(_gameBoard);
-            }
-
+            //while (!_gameover)
+            //{
+            //    DrawBoard();
+            //    Thread.Sleep(_refreshRate);
+            //    if (!_pause)
+            //        CellManager.PulseLife(_gameBoard);
+            //}
         }
 
         /// <summary>
