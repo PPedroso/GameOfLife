@@ -18,10 +18,7 @@ namespace GameOfLife
     /// </summary>
     public class GameEngine : GameWindow
     {
-        /// <summary>
-        /// If true, the game has ended
-        /// </summary>
-        private bool _gameover = false;
+        #region Board Settings
 
         /// <summary>
         /// The board size
@@ -33,16 +30,7 @@ namespace GameOfLife
         /// </summary>
         private GameBoard _gameBoard;
 
-
-        /// <summary>
-        /// The refresh rate of the board in milliseconds
-        /// </summary>
-        private int _refreshRate = 250;
-
-        /// <summary>
-        /// If true, the game is paused
-        /// </summary>
-        private bool _pause = false;
+        #endregion
 
         #region GameSettings
 
@@ -74,11 +62,31 @@ namespace GameOfLife
 
         #endregion
 
+        #region External Implementation
+
+        /// <summary>
+        /// Starts an instance of the game
+        /// </summary>
+        public void Start()
+        {
+            _gameBoard = new GameBoard(BOARD_SIZE);
+            PopulateWorld();
+            this.Run();
+        }
+
+        #endregion
+
+        #region Internal Implementation
         #region Render functionality
+
+        #region Fields
 
         private int _vertexBufferObject;
         private int _vertexArrayObject;
         private int _elementBufferObject;
+        static float symbolSize = 0.005f;
+
+        #endregion
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
@@ -103,10 +111,6 @@ namespace GameOfLife
             base.OnUpdateFrame(args);
         }
 
-
-        static float symbolSize = 0.005f;
-
-
         protected override void OnLoad()
         {
             base.OnLoad();
@@ -128,9 +132,57 @@ namespace GameOfLife
             // Delete all the resources.
             GL.DeleteBuffer(_vertexBufferObject);
             GL.DeleteVertexArray(_vertexArrayObject);
-            GL.DeleteBuffer(_elementBufferObject); 
+            GL.DeleteBuffer(_elementBufferObject);
 
             base.OnUnload();
+        }
+
+        protected override void OnRenderFrame(FrameEventArgs args)
+        {
+            base.OnRenderFrame(args);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+
+            CellManager.PulseLife(_gameBoard);
+            DrawBoard();
+
+            SwapBuffers();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Shows the user menu
+        /// </summary>
+        private void ShowMenu()
+        {
+            Console.WriteLine("Game started!");
+            Console.WriteLine("P - Pause game");
+            Console.WriteLine("B - Create blinker");
+            Console.WriteLine("G - Create glider");
+        }
+
+        /// <summary>
+        /// Draws the board
+        /// </summary>
+        private void DrawBoard()
+        {
+            for (int x = 0; x < BOARD_SIZE; x++)
+            {
+                for (int y = 0; y < BOARD_SIZE; y++)
+                {
+                    if (_gameBoard.GetField(x, y))
+                        DrawSquareAt((x - 99f) / 100f, (99f - y) / 100f);
+                }
+            }
+        }
+
+        private void PopulateWorld()
+        {
+            for (int x = 25; x <= 175; x += 25)
+                for (int y = 25; y <= 175; y += 25)
+                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x, y);
         }
 
         /// <summary>
@@ -153,16 +205,16 @@ namespace GameOfLife
                 2, 0, 1  // Then the second will be the top-right half of the triangle
             };
 
-            
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
-            
+
             GL.BindVertexArray(_vertexArrayObject);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            
+
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
 
@@ -171,80 +223,6 @@ namespace GameOfLife
         }
 
 
-        protected override void OnRenderFrame(FrameEventArgs args)
-        {
-            base.OnRenderFrame(args);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-
-            CellManager.PulseLife(_gameBoard);
-            DrawBoard();
-
-            SwapBuffers();
-        }
-
         #endregion
-
-        /// <summary>
-        /// Starts an instance of the game
-        /// </summary>
-        public void Start()
-        {
-            _gameBoard = new GameBoard(BOARD_SIZE);
-            PopulateWorld();
-            this.Run();
-        }
-
-        private void PopulateWorld()
-        {
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 4);
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 20);
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 60);
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 100);
-            //CellManager.AddSpaceship(_gameBoard, CellManager.SpaceshipType.Glider, 4, 120);
-
-            for (int x = 25; x <= 175; x += 25)
-                for (int y = 25; y <= 175; y += 25)
-                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x, y);
-
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 75, 75);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 100, 100);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 125, 125);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 150, 150);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 175, 175);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 50, 100);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 100, 50);
-            //CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, 35, 115);
-        }
-
-        /// <summary>
-        /// Draws the board
-        /// </summary>
-        private void DrawBoard()
-        {
-            //Console.Clear();
-            //ShowMenu();
-            //Console.WriteLine();
-            for (int x = 0; x < BOARD_SIZE; x++)
-            {
-                for (int y = 0; y < BOARD_SIZE; y++)
-                {
-                    if (_gameBoard.GetField(x, y))
-                        DrawSquareAt((x - 99f) / 100f, (99f - y) / 100f);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Shows the user menu
-        /// </summary>
-        private void ShowMenu()
-        {
-            Console.WriteLine("Game started!");
-            Console.WriteLine("P - Pause game");
-            Console.WriteLine("B - Create blinker");
-            Console.WriteLine("G - Create glider");
-        }
     }
 }
