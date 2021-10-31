@@ -112,7 +112,10 @@ namespace GameOfLife
             base.OnLoad();
 
             GL.ClearColor(new Color4(0.3f, 0.4f, 0.5f, 1f));
-            CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Blinker, 50, 50);
+
+            _vertexBufferObject = GL.GenBuffer();
+            _vertexArrayObject = GL.GenVertexArray();
+            _elementBufferObject = GL.GenBuffer();
         }
 
         protected override void OnUnload()
@@ -125,6 +128,7 @@ namespace GameOfLife
             // Delete all the resources.
             GL.DeleteBuffer(_vertexBufferObject);
             GL.DeleteVertexArray(_vertexArrayObject);
+            GL.DeleteBuffer(_elementBufferObject); 
 
             base.OnUnload();
         }
@@ -149,16 +153,16 @@ namespace GameOfLife
                 2, 0, 1  // Then the second will be the top-right half of the triangle
             };
 
-            _vertexBufferObject = GL.GenBuffer();
+            
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
 
-            _vertexArrayObject = GL.GenVertexArray();
+            
             GL.BindVertexArray(_vertexArrayObject);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            _elementBufferObject = GL.GenBuffer();
+            
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
 
