@@ -48,7 +48,7 @@ namespace GameOfLife
         /// </summary>
         private static NativeWindowSettings _nativeWindowSettings = new NativeWindowSettings
         {
-            Size = new Vector2i(800, 800),
+            Size = new Vector2i(BOARD_SIZE * 4, BOARD_SIZE * 4),
             Title = "Game of Life",
         };
 
@@ -180,9 +180,11 @@ namespace GameOfLife
 
         private void PopulateWorld()
         {
-            for (int x = 25; x <= 175; x += 25)
-                for (int y = 25; y <= 175; y += 25)
-                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x, y);
+            int totalDivisions = BOARD_SIZE / 25;
+            
+            for (int x = 1; x < totalDivisions; x++)
+                for (int y = 1; y < totalDivisions; y++)
+                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x*25, y*25);
         }
 
         /// <summary>
@@ -213,7 +215,6 @@ namespace GameOfLife
             GL.BindVertexArray(_vertexArrayObject);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
-
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
