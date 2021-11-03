@@ -1,4 +1,5 @@
 ﻿using GameOfLife.Board;
+using System.Drawing;
 
 namespace GameOfLife.Cells
 {
@@ -71,35 +72,21 @@ namespace GameOfLife.Cells
             switch (type)
             {
                 case OscilatorType.Blinker:
-                    if (x < 1) x = 1;
-                    if (y < 1) y = 1;
 
-                    //TODO: Refactor this to be used by all cell forms
-                    if (x >= gameBoard.GetBoardLenght -1) x = gameBoard.GetBoardLenght - 2;
-                    if (y >= gameBoard.GetBoardLenght -1) y = gameBoard.GetBoardLenght - 2;
-
-                    gameBoard.SetField(x, y);
-                    gameBoard.SetField(x, y - 1);
-                    gameBoard.SetField(x, y + 1);
+                    Blinker blinker = new();
+                    blinker.Insert(gameBoard, new Point(x, y));
                     break;
 
                 case OscilatorType.Toad:
-                    gameBoard.SetField(x, y);
-                    gameBoard.SetField(x, y - 1);
-                    gameBoard.SetField(x, y - 2);
-                    gameBoard.SetField(x - 1, y);
-                    gameBoard.SetField(x - 1, y - 1);
-                    gameBoard.SetField(x - 1, y + 1);
+
+                    Toad toad = new();
+                    toad.Insert(gameBoard, new Point(x, y));
                     break;
+
                 case OscilatorType.Beacon:
-                    gameBoard.SetField(x, y);
-                    gameBoard.SetField(x, y - 1);
-                    gameBoard.SetField(x - 1, y);
-                    gameBoard.SetField(x - 1, y - 1);
-                    gameBoard.SetField(x + 1, y + 1);
-                    gameBoard.SetField(x + 1, y + 2);
-                    gameBoard.SetField(x + 2, y + 1);
-                    gameBoard.SetField(x + 2, y + 2);
+
+                    Beacon beacon = new();
+                    beacon.Insert(gameBoard, new Point(x, y));
                     break;
 
                 case OscilatorType.Pulsar:
@@ -202,9 +189,9 @@ namespace GameOfLife.Cells
         public static void PulseLife(GameBoard board)
         {
 
-            for (int x = 0; x < board.GetBoardLenght; x++)
+            for (int x = 0; x < board.Length; x++)
             {
-                for (int y = 0; y < board.GetBoardLenght; y++)
+                for (int y = 0; y < board.Length; y++)
                 {
                     var neighbors = CellManager.CountNeighbors(board, x, y);
                     var isLiveCell = board.GetField(x, y);
