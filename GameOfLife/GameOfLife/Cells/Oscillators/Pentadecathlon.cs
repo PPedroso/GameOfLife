@@ -12,7 +12,7 @@ namespace GameOfLife.Cells.Oscillators
 
         public void Insert(GameBoard gameboard, Point point)
         {
-            ValidateCoordinates(gameboard.Length, point);
+            point = ValidateCoordinates(gameboard.Length, point);
 
             gameboard.SetField(point.X, point.Y);
             gameboard.SetField(point.X - 4, point.Y);

@@ -21,12 +21,14 @@ namespace GameOfLife.Cells
         /// </summary>
         /// <param name="boardLength"></param>
         /// <param name="point"></param>
-        public void ValidateCoordinates(int boardLength, Point point)
+        public Point ValidateCoordinates(int boardLength, Point point)
         {
             if (point.X < minx) point.X = minx;
             if (point.Y < miny) point.Y = miny;
             if (point.X > boardLength - minx) point.X = boardLength - minx;
             if (point.Y > boardLength - miny) point.Y = boardLength - miny;
+
+            return point;
         }
     }
 }

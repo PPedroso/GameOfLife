@@ -15,6 +15,6 @@ namespace GameOfLife.Cells
         /// <summary>
         /// Checks if coordinates are valid
         /// </summary>
-        void ValidateCoordinates(int boardLength, Point point);
+        Point ValidateCoordinates(int boardLength, Point point);
     }
 }
