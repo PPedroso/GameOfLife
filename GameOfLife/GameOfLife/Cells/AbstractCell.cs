@@ -2,6 +2,9 @@
 
 namespace GameOfLife.Cells
 {
+    /// <summary>
+    /// Base cell functionalities
+    /// </summary>
     public abstract class AbstractCell
     {
         int minx;
@@ -13,6 +16,11 @@ namespace GameOfLife.Cells
             this.miny = miny;
         }
 
+        /// <summary>
+        /// Validate coordinates to make sure they're in valid range
+        /// </summary>
+        /// <param name="boardLength"></param>
+        /// <param name="point"></param>
         public void ValidateCoordinates(int boardLength, Point point)
         {
             if (point.X < minx) point.X = minx;

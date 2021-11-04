@@ -1,4 +1,6 @@
 ﻿using GameOfLife.Board;
+using GameOfLife.Cells.Oscillators;
+using GameOfLife.Cells.Spaceships;
 using System.Drawing;
 
 namespace GameOfLife.Cells
@@ -45,18 +47,18 @@ namespace GameOfLife.Cells
         /// Counts the number neighbors of this cell.
         /// </summary>
         /// <returns>The number of neighbors</returns>
-        public static int CountNeighbors(GameBoard gameBoard, int x, int y)
+        public static int CountNeighbors(GameBoard gameboard, int x, int y)
         {
             int count = 0;
 
-            if (gameBoard.GetField(x - 1, y - 1)) count++;
-            if (gameBoard.GetField(x + 0, y - 1)) count++;
-            if (gameBoard.GetField(x + 1, y - 1)) count++;
-            if (gameBoard.GetField(x - 1, y)) count++;
-            if (gameBoard.GetField(x + 1, y)) count++;
-            if (gameBoard.GetField(x - 1, y + 1)) count++;
-            if (gameBoard.GetField(x + 0, y + 1)) count++;
-            if (gameBoard.GetField(x + 1, y + 1)) count++;
+            if (gameboard.GetField(x - 1, y - 1)) count++;
+            if (gameboard.GetField(x + 0, y - 1)) count++;
+            if (gameboard.GetField(x + 1, y - 1)) count++;
+            if (gameboard.GetField(x - 1, y)) count++;
+            if (gameboard.GetField(x + 1, y)) count++;
+            if (gameboard.GetField(x - 1, y + 1)) count++;
+            if (gameboard.GetField(x + 0, y + 1)) count++;
+            if (gameboard.GetField(x + 1, y + 1)) count++;
 
             return count;
         }
@@ -90,72 +92,15 @@ namespace GameOfLife.Cells
                     break;
 
                 case OscilatorType.Pulsar:
-                    gameBoard.SetField(x - 2, y - 1);
-                    gameBoard.SetField(x - 3, y - 1);
-                    gameBoard.SetField(x - 4, y - 1);
-                    gameBoard.SetField(x - 1, y - 2);
-                    gameBoard.SetField(x - 1, y - 3);
-                    gameBoard.SetField(x - 1, y - 4);
-                    gameBoard.SetField(x - 6, y - 2);
-                    gameBoard.SetField(x - 6, y - 3);
-                    gameBoard.SetField(x - 6, y - 4);
-                    gameBoard.SetField(x - 2, y - 6);
-                    gameBoard.SetField(x - 3, y - 6);
-                    gameBoard.SetField(x - 4, y - 6);
 
-                    gameBoard.SetField(x + 2, y + 1);
-                    gameBoard.SetField(x + 3, y + 1);
-                    gameBoard.SetField(x + 4, y + 1);
-                    gameBoard.SetField(x + 1, y + 2);
-                    gameBoard.SetField(x + 1, y + 3);
-                    gameBoard.SetField(x + 1, y + 4);
-                    gameBoard.SetField(x + 6, y + 2);
-                    gameBoard.SetField(x + 6, y + 3);
-                    gameBoard.SetField(x + 6, y + 4);
-                    gameBoard.SetField(x + 2, y + 6);
-                    gameBoard.SetField(x + 3, y + 6);
-                    gameBoard.SetField(x + 4, y + 6);
-
-                    gameBoard.SetField(x - 2, y + 1);
-                    gameBoard.SetField(x - 3, y + 1);
-                    gameBoard.SetField(x - 4, y + 1);
-                    gameBoard.SetField(x - 1, y + 2);
-                    gameBoard.SetField(x - 1, y + 3);
-                    gameBoard.SetField(x - 1, y + 4);
-                    gameBoard.SetField(x - 6, y + 2);
-                    gameBoard.SetField(x - 6, y + 3);
-                    gameBoard.SetField(x - 6, y + 4);
-                    gameBoard.SetField(x - 2, y + 6);
-                    gameBoard.SetField(x - 3, y + 6);
-                    gameBoard.SetField(x - 4, y + 6);
-
-                    gameBoard.SetField(x + 2, y - 1);
-                    gameBoard.SetField(x + 3, y - 1);
-                    gameBoard.SetField(x + 4, y - 1);
-                    gameBoard.SetField(x + 1, y - 2);
-                    gameBoard.SetField(x + 1, y - 3);
-                    gameBoard.SetField(x + 1, y - 4);
-                    gameBoard.SetField(x + 6, y - 2);
-                    gameBoard.SetField(x + 6, y - 3);
-                    gameBoard.SetField(x + 6, y - 4);
-                    gameBoard.SetField(x + 2, y - 6);
-                    gameBoard.SetField(x + 3, y - 6);
-                    gameBoard.SetField(x + 4, y - 6);
+                    Pulsar pulsar = new();
+                    pulsar.Insert(gameBoard, new Point(x, y));
                     break;
 
                 case OscilatorType.Pentadecathlon:
-                    gameBoard.SetField(x, y);
-                    gameBoard.SetField(x - 4, y);
-                    gameBoard.SetField(x - 3, y);
-                    gameBoard.SetField(x - 2, y - 1);
-                    gameBoard.SetField(x - 2, y + 1);
-                    gameBoard.SetField(x - 1, y);
-                    gameBoard.SetField(x + 1, y);
-                    gameBoard.SetField(x + 2, y);
-                    gameBoard.SetField(x + 3, y - 1);
-                    gameBoard.SetField(x + 3, y + 1);
-                    gameBoard.SetField(x + 4, y);
-                    gameBoard.SetField(x + 5, y);
+
+                    Pentadecathlon pentadecathlon = new();
+                    pentadecathlon.Insert(gameBoard, new Point(x, y));
                     break;
             }
             PulseLife(gameBoard);
@@ -164,23 +109,21 @@ namespace GameOfLife.Cells
         /// <summary>
         /// Adds the spaceship type cell at the coordinates x and y.
         /// </summary>
-        /// <param name="gameBoard">The game board.</param>
+        /// <param name="gameboard">The game board.</param>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate</param>
-        public static void AddSpaceship(GameBoard gameBoard, SpaceshipType type, int x, int y)
+        public static void AddSpaceship(GameBoard gameboard, SpaceshipType type, int x, int y)
         {
             switch (type)
             {
                 case SpaceshipType.Glider:
-                    gameBoard.SetField(x, y);
-                    gameBoard.SetField(x - 1, y);
-                    gameBoard.SetField(x - 2, y);
-                    gameBoard.SetField(x, y - 1);
-                    gameBoard.SetField(x - 1, y - 2);
+
+                    Glider glider = new();
+                    glider.Insert(gameboard, new Point(x, y));
                     break;
             }
 
-            PulseLife(gameBoard);
+            PulseLife(gameboard);
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using GameOfLife.Board;
 using System.Drawing;
 
-namespace GameOfLife.Cells
+namespace GameOfLife.Cells.Oscillators
 {
     /// <summary>
     /// Defines the behaviour of a beacon cell
