@@ -121,6 +121,24 @@ namespace GameOfLife.Cells
                     Glider glider = new();
                     glider.Insert(gameboard, new Point(x, y));
                     break;
+
+                case SpaceshipType.LWSS:
+
+                    LWSS lwss = new();
+                    lwss.Insert(gameboard, new Point(x, y));
+                    break;
+
+                case SpaceshipType.MWSS:
+
+                    MWSS mwss = new();
+                    mwss.Insert(gameboard, new Point(x, y));
+                    break;
+
+                case SpaceshipType.HWSS:
+
+                    HWSS hwss = new();
+                    hwss.Insert(gameboard, new Point(x, y));
+                    break;
             }
 
             PulseLife(gameboard);

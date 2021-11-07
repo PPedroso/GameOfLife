@@ -72,7 +72,7 @@ namespace GameOfLife
             this.CenterWindow();
             ShowMenu();
             ResetBoard();
-            PopulateWorld();
+            //PopulateWorld();
             this.Run();
         }
 
@@ -174,15 +174,6 @@ namespace GameOfLife
                         DrawSquareAt((x - 99f) / 100f, (99f - y) / 100f);
                 }
             }
-        }
-
-        private void PopulateWorld()
-        {
-            int totalDivisions = BOARD_SIZE / 25;
-
-            for (int x = 1; x < totalDivisions; x++)
-                for (int y = 1; y < totalDivisions; y++)
-                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x * 25, y * 25);
         }
 
         /// <summary>
@@ -301,6 +292,22 @@ namespace GameOfLife
             CellManager.AddSpaceship(gameboard, type, x, y);
         }
 
+
+        #endregion
+
+        #region Debug
+
+        /// <summary>
+        /// Adds initial cells to the game board
+        /// </summary>
+        private void PopulateWorld()
+        {
+            int totalDivisions = BOARD_SIZE / 25;
+
+            for (int x = 1; x < totalDivisions; x++)
+                for (int y = 1; y < totalDivisions; y++)
+                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x * 25, y * 25);
+        }
 
         #endregion
     }
