@@ -32,7 +32,7 @@ namespace GameOfLife
 
         #endregion
 
-        #region GameSettings
+        #region Game Settings
 
         /// <summary>
         /// The settings for the game window
@@ -69,7 +69,9 @@ namespace GameOfLife
         /// </summary>
         public void Start()
         {
-            _gameBoard = new GameBoard(BOARD_SIZE);
+            this.CenterWindow();
+            ShowMenu();
+            ResetBoard();
             PopulateWorld();
             this.Run();
         }
@@ -90,26 +92,11 @@ namespace GameOfLife
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
-
-            if (KeyboardState.IsKeyDown(Keys.Escape))
-                Close();
-
-            if (KeyboardState.IsKeyDown(Keys.B))
-                CellManager.AddOscillator(
-                                 _gameBoard,
-                                 CellManager.OscilatorType.Blinker,
-                                 RandomNumberGenerator.GetInt32(BOARD_SIZE),
-                                 RandomNumberGenerator.GetInt32(BOARD_SIZE));
-
-            if (KeyboardState.IsKeyDown(Keys.G))
-                CellManager.AddSpaceship(
-                                _gameBoard,
-                                CellManager.SpaceshipType.Glider,
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE),
-                                RandomNumberGenerator.GetInt32(BOARD_SIZE));
+            ProcessInput();
 
             base.OnUpdateFrame(args);
         }
+
 
         protected override void OnLoad()
         {
@@ -157,10 +144,21 @@ namespace GameOfLife
         /// </summary>
         private void ShowMenu()
         {
-            Console.WriteLine("Game started!");
-            Console.WriteLine("P - Pause game");
-            Console.WriteLine("B - Create blinker");
-            Console.WriteLine("G - Create glider");
+            Console.WriteLine("Create oscilators");
+            Console.WriteLine("B - Blinker");
+            Console.WriteLine("T - Toad");
+            Console.WriteLine("E - Beacon");
+            Console.WriteLine("P - Pulsar");
+            Console.WriteLine("D - Pentadecathlon");
+            Console.WriteLine();
+            Console.WriteLine("Create spaceships");
+            Console.WriteLine("G - Glider");
+            Console.WriteLine("L - Light weight spaceship");
+            Console.WriteLine("M - Medium weight spaceship");
+            Console.WriteLine("H - Heavy weight spaceship");
+            Console.WriteLine();
+            Console.WriteLine("R - Reset board");
+            Console.WriteLine("X - Close game");
         }
 
         /// <summary>
@@ -181,10 +179,10 @@ namespace GameOfLife
         private void PopulateWorld()
         {
             int totalDivisions = BOARD_SIZE / 25;
-            
+
             for (int x = 1; x < totalDivisions; x++)
                 for (int y = 1; y < totalDivisions; y++)
-                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x*25, y*25);
+                    CellManager.AddOscillator(_gameBoard, CellManager.OscilatorType.Pulsar, x * 25, y * 25);
         }
 
         /// <summary>
@@ -221,6 +219,86 @@ namespace GameOfLife
 
             GL.BindVertexArray(this._vertexArrayObject);
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+        }
+
+        /// <summary>
+        /// Processes the user input
+        /// </summary>
+        private void ProcessInput()
+        {
+
+            /* Oscilators*/
+
+            if (KeyboardState.IsKeyDown(Keys.B))
+                AddRandomOscilator(_gameBoard, CellManager.OscilatorType.Blinker);
+
+            if (KeyboardState.IsKeyDown(Keys.T))
+                AddRandomOscilator(_gameBoard, CellManager.OscilatorType.Toad);
+
+            if (KeyboardState.IsKeyDown(Keys.E))
+                AddRandomOscilator(_gameBoard, CellManager.OscilatorType.Beacon);
+
+            if (KeyboardState.IsKeyDown(Keys.P))
+                AddRandomOscilator(_gameBoard, CellManager.OscilatorType.Pulsar);
+
+            if (KeyboardState.IsKeyDown(Keys.D))
+                AddRandomOscilator(_gameBoard, CellManager.OscilatorType.Pentadecathlon);
+
+            /* Spaceships */
+
+            if (KeyboardState.IsKeyDown(Keys.G))
+                AddRandomSpaceship(_gameBoard, CellManager.SpaceshipType.Glider);
+
+            if (KeyboardState.IsKeyDown(Keys.L))
+                AddRandomSpaceship(_gameBoard, CellManager.SpaceshipType.LWSS);
+
+            if (KeyboardState.IsKeyDown(Keys.M))
+                AddRandomSpaceship(_gameBoard, CellManager.SpaceshipType.MWSS);
+
+            if (KeyboardState.IsKeyDown(Keys.H))
+                AddRandomSpaceship(_gameBoard, CellManager.SpaceshipType.HWSS);
+
+            /*  Special commands */
+
+            if (KeyboardState.IsKeyDown(Keys.R))
+                ResetBoard();
+
+            if (KeyboardState.IsKeyDown(Keys.X) || KeyboardState.IsKeyDown(Keys.Escape))
+                this.Close();
+        }
+
+        /// <summary>
+        /// Resets the board to its initial state
+        /// </summary>
+        private void ResetBoard()
+        {
+            _gameBoard = new GameBoard(BOARD_SIZE);
+        }
+
+        /// <summary>
+        /// Adds the supplied oscilator type cell at a random position on the board
+        /// </summary>
+        /// <param name="gameboard">The gameboard to add the cell to</param>
+        /// <param name="type">The type of oscilator</param>
+        private void AddRandomOscilator(GameBoard gameboard, CellManager.OscilatorType type)
+        {
+            var x = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+            var y = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+
+            CellManager.AddOscillator(gameboard, type, x, y);
+        }
+
+        /// <summary>
+        /// Adds teh supplied spaceship type cell at a random position on the board
+        /// </summary>
+        /// <param name="gameboard">The gameboard to add the cell to</param>
+        /// <param name="type">The type of spaceship to add</param>
+        private void AddRandomSpaceship(GameBoard gameboard, CellManager.SpaceshipType type)
+        {
+            var x = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+            var y = RandomNumberGenerator.GetInt32(BOARD_SIZE);
+
+            CellManager.AddSpaceship(gameboard, type, x, y);
         }
 
 
