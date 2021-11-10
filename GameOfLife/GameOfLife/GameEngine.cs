@@ -87,6 +87,7 @@ namespace GameOfLife
         private int _vertexArrayObject;
         private int _elementBufferObject;
         static float symbolSize = 0.005f;
+        private Shader _shader;
 
         #endregion
 
@@ -107,6 +108,9 @@ namespace GameOfLife
             _vertexBufferObject = GL.GenBuffer();
             _vertexArrayObject = GL.GenVertexArray();
             _elementBufferObject = GL.GenBuffer();
+            _shader = new Shader("../../../shader.vert", "../../../shader.frag");
+            _shader.Use();
+
         }
 
         protected override void OnUnload()
@@ -120,6 +124,8 @@ namespace GameOfLife
             GL.DeleteBuffer(_vertexBufferObject);
             GL.DeleteVertexArray(_vertexArrayObject);
             GL.DeleteBuffer(_elementBufferObject);
+
+            _shader.Dispose();
 
             base.OnUnload();
         }
@@ -192,8 +198,8 @@ namespace GameOfLife
 
             uint[] _indices =
             {
-                3, 2, 0, // The first triangle will be the bottom-right half of the triangle
-                2, 0, 1  // Then the second will be the top-right half of the triangle
+                3, 2, 0, // The first triangle will be the bottom-right half of the square
+                2, 0, 1  // Then the second will be the top-right half of the square
             };
 
 
