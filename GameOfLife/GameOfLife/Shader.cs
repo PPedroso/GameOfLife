@@ -8,7 +8,9 @@ namespace GameOfLife
 
     public class Shader
     {
-        int Handle;
+        public int Handle => _handle;
+
+        private int _handle;
 
         public Shader(string vertexPath, string fragmentPath)
         {
@@ -50,22 +52,22 @@ namespace GameOfLife
             if (infoLogFrag != System.String.Empty)
                 System.Console.WriteLine(infoLogFrag);
 
-            Handle = GL.CreateProgram();
+            _handle = GL.CreateProgram();
 
-            GL.AttachShader(Handle, VertexShader);
-            GL.AttachShader(Handle, FragmentShader);
+            GL.AttachShader(_handle, VertexShader);
+            GL.AttachShader(_handle, FragmentShader);
 
-            GL.LinkProgram(Handle);
+            GL.LinkProgram(_handle);
 
-            GL.DetachShader(Handle, VertexShader);
-            GL.DetachShader(Handle, FragmentShader);
+            GL.DetachShader(_handle, VertexShader);
+            GL.DetachShader(_handle, FragmentShader);
             GL.DeleteShader(FragmentShader);
             GL.DeleteShader(VertexShader);
         }
 
         public void Use()
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(_handle);
         }
 
         private bool disposedValue = false;
@@ -73,16 +75,16 @@ namespace GameOfLife
         {
             if (!disposedValue)
             {
-                GL.DeleteProgram(Handle);
+                GL.DeleteProgram(_handle);
 
                 disposedValue = true;
             }
         }
 
-        
+
         ~Shader()
         {
-            GL.DeleteProgram(Handle);
+            GL.DeleteProgram(_handle);
         }
 
         public void Dispose()

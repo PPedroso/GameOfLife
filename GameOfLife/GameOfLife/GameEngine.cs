@@ -135,9 +135,10 @@ namespace GameOfLife
             base.OnRenderFrame(args);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
-
+            _shader.Use();
 
             CellManager.PulseLife(_gameBoard);
+
             DrawBoard();
 
             SwapBuffers();
@@ -182,6 +183,25 @@ namespace GameOfLife
             }
         }
 
+
+        /// <summary>
+        /// Sets the color for drawing
+        /// </summary>
+        private void SetColor()
+        {
+            var seed = RandomNumberGenerator.GetInt32(61);
+            float greenValue = (float)Math.Sin(seed) / (2.0f + 0.5f);
+            
+            seed = RandomNumberGenerator.GetInt32(61);
+            float redValue = (float)Math.Sin(seed) / (2.0f + 0.5f);
+            
+            seed = RandomNumberGenerator.GetInt32(61);
+            float blueValue = (float)Math.Sin(seed) / (2.0f + 0.5f);
+
+            int vertexColorLocation = GL.GetUniformLocation(_shader.Handle, "ourColor");
+            GL.Uniform4(vertexColorLocation, redValue, greenValue, blueValue, 1.0f);
+        }
+
         /// <summary>
         /// Draws a square form at x,y
         /// </summary>
@@ -189,6 +209,8 @@ namespace GameOfLife
         /// <param name="y"></param>
         private void DrawSquareAt(float x, float y)
         {
+            SetColor();
+
             float[] _vertices = new float[] {
                 x + symbolSize *  1f,y + symbolSize *  1f, 0.0f, // top right
                 x + symbolSize *  1f,y + symbolSize * -1f, 0.0f, // bottom right
