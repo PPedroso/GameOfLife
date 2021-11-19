@@ -1,11 +1,14 @@
 # Game of life
 Game of life done in C# and using OpenTK's OpenGL library
 
-## Screenshots
+## Purpose
+The objective of this project was to have a better understanding of OpenGL and test a .NET Core console application.
 
-![image](https://user-images.githubusercontent.com/5556467/140659683-a9a41947-c681-47b6-b41c-c237c9ef2af2.png)
+This game has no main objective other than creating cells and watch them interact with each other.
 
-![image](https://user-images.githubusercontent.com/5556467/140659670-2e76df54-9656-4770-96e1-8edbe0ad8871.png)
+## Controls
+![image](https://user-images.githubusercontent.com/5556467/142577934-05627606-bc88-417d-b580-93675389aa5f.png)
 
-
+## Preview
+![Animation](https://user-images.githubusercontent.com/5556467/142578987-8859b08b-3c3a-497b-bd50-463ae67befb2.gif)
 
